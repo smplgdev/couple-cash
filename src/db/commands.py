@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, distinct
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import DataError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -47,15 +47,17 @@ async def add_expense(
         session: AsyncSession,
         user_id: int,
         amount: float,
-        category: str = None,
-        comment: str = None,
+        category: str,
+        comment: str,
+        payment_type: str
 ) -> bool:
     await session.merge(
         Expense(
             user_tg_id=user_id,
             amount=amount,
             category=category,
-            comment=comment
+            comment=comment,
+            payment_type=payment_type
         )
     )
     try:
@@ -81,3 +83,15 @@ async def is_user_linked(session: AsyncSession, tg_id: int) -> bool:
 
     is_exists = await session.execute(stmt)
     return bool(is_exists.scalar_one_or_none())
+
+
+async def select_last_categories_of_user(session: AsyncSession, user_tg_id: int, n: int = 5) -> list[str]:
+    stmt = (
+        select(Expense.category).
+        where(Expense.user_tg_id == user_tg_id).
+        order_by(Expense.created_at.desc()).
+        limit(n)
+    )
+
+    result = await session.execute(stmt)
+    return list(set(row[0] for row in result.all()))

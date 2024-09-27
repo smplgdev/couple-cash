@@ -36,6 +36,7 @@ class Expense(TimeStampedMixin, Base):
     amount = Column(DECIMAL(8, 2), nullable=False)
     category = Column(String(length=64))
     comment = Column(String(length=255))
+    payment_type = Column(String(length=32), nullable=False)
 
 
 class UserRelationship(Base):
@@ -47,6 +48,7 @@ class UserRelationship(Base):
 
     __table_args__ = (
         UniqueConstraint('initiating_user_tg_id', 'partner_user_tg_id', name='unique_relationship'),
+        # TODO: Check reversed record
     )
 
     initiating_user = relationship(
