@@ -1,5 +1,5 @@
 from pytz import timezone
-from sqlalchemy import Column, Integer, BigInteger, String, DateTime, func
+from sqlalchemy import Column, Integer, BigInteger, String, DateTime, func, ForeignKey, DECIMAL
 from sqlalchemy.orm import declared_attr
 
 from config_reader import config
@@ -26,3 +26,13 @@ class User(TimeStampedMixin, Base):
     tg_username = Column(String(length=32), unique=True)
     tg_first_name = Column(String(length=64))
     tg_language_code = Column(String(length=6))
+
+
+class Expense(TimeStampedMixin, Base):
+    __tablename__ = "expenses"
+
+    id = Column(Integer, primary_key=True)
+    user_tg_id = Column(ForeignKey('users.tg_id', ondelete="CASCADE"), nullable=False)
+    amount = Column(DECIMAL(8, 2), nullable=False)
+    category = Column(String(length=64))
+    comment = Column(String(length=255))
