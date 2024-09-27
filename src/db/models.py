@@ -1,6 +1,6 @@
 from pytz import timezone
-from sqlalchemy import Column, Integer, BigInteger, String, DateTime, func, ForeignKey, DECIMAL
-from sqlalchemy.orm import declared_attr
+from sqlalchemy import Column, Integer, BigInteger, String, DateTime, func, ForeignKey, DECIMAL, UniqueConstraint
+from sqlalchemy.orm import declared_attr, relationship
 
 from config_reader import config
 from db.base import Base
@@ -36,3 +36,24 @@ class Expense(TimeStampedMixin, Base):
     amount = Column(DECIMAL(8, 2), nullable=False)
     category = Column(String(length=64))
     comment = Column(String(length=255))
+
+
+class UserRelationship(Base):
+    __tablename__ = "user_relationships"
+
+    id = Column(Integer, primary_key=True)
+    initiating_user_tg_id = Column(ForeignKey('users.tg_id', ondelete="CASCADE"), nullable=False)
+    partner_user_tg_id = Column(ForeignKey('users.tg_id', ondelete="CASCADE"), nullable=False)
+
+    __table_args__ = (
+        UniqueConstraint('initiating_user_tg_id', 'partner_user_tg_id', name='unique_relationship'),
+    )
+
+    initiating_user = relationship(
+        "User",
+        foreign_keys=[initiating_user_tg_id],
+    )
+    partner_user = relationship(
+        "User",
+        foreign_keys=[partner_user_tg_id],
+    )

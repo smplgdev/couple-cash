@@ -19,4 +19,4 @@ async def start_command(message: Message, session: AsyncSession):
         tg_language_code=message.from_user.language_code,
         return_user=False
     )
-    await message.answer(f"Hello, {message.from_user.full_name}!\n\nTo start using me, just send command {hcode("/add_expense <amount>")}!")
+    await message.answer(f"Hello, {message.from_user.full_name}!\n\nTo start using me, just send command {hcode("/expense <amount>")}!")

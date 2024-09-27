@@ -1,7 +1,10 @@
+from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import insert
+from sqlalchemy.exc import DataError
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.operators import or_
 
-from db import User
+from db import User, UserRelationship
 from db.models import Expense
 
 
@@ -46,7 +49,7 @@ async def add_expense(
         amount: float,
         category: str = None,
         comment: str = None,
-):
+) -> bool:
     await session.merge(
         Expense(
             user_tg_id=user_id,
@@ -55,4 +58,26 @@ async def add_expense(
             comment=comment
         )
     )
-    await session.commit()
+    try:
+        await session.commit()
+    except DataError:
+        return False
+
+    return True
+
+
+async def is_user_linked(session: AsyncSession, tg_id: int) -> bool:
+    # TODO: Rewrite this with exists()
+
+    stmt = (
+        select(UserRelationship).
+        filter(
+            or_(
+                UserRelationship.initiating_user_tg_id == tg_id,
+                UserRelationship.partner_user_tg_id == tg_id,
+            )
+        )
+    )
+
+    is_exists = await session.execute(stmt)
+    return bool(is_exists.scalar_one_or_none())

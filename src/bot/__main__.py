@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from bot.middlewares.db import DbSessionMiddleware
 from config_reader import config
 
-from bot.handlers import start, add_expense_command
+from bot.handlers import start, expense_command
 
 
 def setup_logging():
@@ -41,7 +41,7 @@ async def main():
     dp.update.middleware(DbSessionMiddleware(session_pool=sessionmaker))
 
     dp.include_router(start.router)
-    dp.include_router(add_expense_command.router)
+    dp.include_router(expense_command.router)
 
     try:
         await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())
