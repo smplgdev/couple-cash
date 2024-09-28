@@ -5,7 +5,7 @@ from aiogram.types import Message
 from aiogram.utils.markdown import hcode
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from bot.keyboards import payment_type_keyboard, main_menu_keyboard, markup_of_categories
+from bot.keyboards import payment_type_keyboard, main_menu_keyboard, categories_markup, ADD_EXPENSE
 from db.commands import add_expense, select_last_categories_of_user
 from filters.linked_users import LinkedUsersFilter
 
@@ -20,7 +20,7 @@ class ExpenseStates(StatesGroup):
 router = Router()
 
 
-@router.message(LinkedUsersFilter(), F.text == "Add expense")
+@router.message(LinkedUsersFilter(), F.text == ADD_EXPENSE)
 async def expense_handler(message: Message, state: FSMContext):
     await state.set_state(ExpenseStates.amount)
     await message.answer("Please, specify the amount of the expense:")
@@ -40,7 +40,7 @@ async def amount_handler(message: Message, state: FSMContext, session: AsyncSess
 
     await state.set_state(ExpenseStates.category)
     last_five_categories = await select_last_categories_of_user(session, user_tg_id=message.from_user.id, n=5)
-    await message.answer("Please, specify the category of the expense:", reply_markup=markup_of_categories(last_five_categories))
+    await message.answer("Please, specify the category of the expense:", reply_markup=categories_markup(last_five_categories))
 
 
 @router.message(LinkedUsersFilter(), ExpenseStates.category)
@@ -80,6 +80,6 @@ async def payment_type_handler(message: Message, state: FSMContext, session: Asy
                          reply_markup=main_menu_keyboard)
 
 
-@router.message(~LinkedUsersFilter(), F.text == "Add expense")
+@router.message(~LinkedUsersFilter(), F.text == ADD_EXPENSE)
 async def not_linked_user_handler(message: Message):
     await message.answer("You are not linked with any user so far.")

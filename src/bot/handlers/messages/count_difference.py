@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.types import Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from bot.keyboards import PAY_FOR_MY_PARTNER, SPLIT_THE_EXPENSE, PAY_FOR_MYSELF
+from bot.keyboards import PAY_FOR_MY_PARTNER, SPLIT_THE_EXPENSE
 from db import UserRelationship
 from db.commands import get_all_expenses
 from filters.linked_users import LinkedUsersFilter

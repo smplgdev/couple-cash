@@ -2,20 +2,28 @@ from typing import Iterable
 
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-main_menu_keyboard = ReplyKeyboardMarkup(keyboard=[
-    [
-        KeyboardButton(text="Add expense"),
-    ],
-    [
-        KeyboardButton(text="Count difference"),
-    ]
-], resize_keyboard=True)
-
+LINK_YOUR_PARTNER = "Link your partner"
+ADD_EXPENSE = "Add expense"
+COUNT_DIFFERENCE = "Count difference"
 
 PAY_FOR_MYSELF = "Pay for myself"
 PAY_FOR_MY_PARTNER = "Pay for my partner"
 SPLIT_THE_EXPENSE = "Split the expense"
 
+main_menu_keyboard = ReplyKeyboardMarkup(keyboard=[
+    [
+        KeyboardButton(text=ADD_EXPENSE),
+    ],
+    [
+        KeyboardButton(text=COUNT_DIFFERENCE),
+    ]
+], resize_keyboard=True)
+
+link_user_markup = ReplyKeyboardMarkup(keyboard=[
+    [
+        KeyboardButton(text=LINK_YOUR_PARTNER),
+    ],
+], resize_keyboard=True)
 
 payment_type_keyboard = ReplyKeyboardMarkup(keyboard=[
     [
@@ -28,7 +36,7 @@ payment_type_keyboard = ReplyKeyboardMarkup(keyboard=[
 ], resize_keyboard=True)
 
 
-def markup_of_categories(categories: Iterable) -> ReplyKeyboardMarkup:
+def categories_markup(categories: Iterable) -> ReplyKeyboardMarkup:
     keyboard = []
     for category in set(categories):
         keyboard.append([KeyboardButton(text=category)])
