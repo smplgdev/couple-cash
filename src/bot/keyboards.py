@@ -2,7 +2,6 @@ from typing import Iterable
 
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 
-LINK_YOUR_PARTNER = "Link your partner"
 ADD_EXPENSE = "Add expense"
 COUNT_DIFFERENCE = "Count difference"
 
@@ -17,12 +16,6 @@ main_menu_keyboard = ReplyKeyboardMarkup(keyboard=[
     [
         KeyboardButton(text=COUNT_DIFFERENCE),
     ]
-], resize_keyboard=True)
-
-link_user_markup = ReplyKeyboardMarkup(keyboard=[
-    [
-        KeyboardButton(text=LINK_YOUR_PARTNER),
-    ],
 ], resize_keyboard=True)
 
 payment_type_keyboard = ReplyKeyboardMarkup(keyboard=[

@@ -78,8 +78,3 @@ async def payment_type_handler(message: Message, state: FSMContext, session: Asy
     await state.clear()
     await message.answer(f"Expense {hcode(amount)} has been added with category {hcode(category)} and comment {hcode(comment)}!",
                          reply_markup=main_menu_keyboard)
-
-
-@router.message(~LinkedUsersFilter(), F.text == ADD_EXPENSE)
-async def not_linked_user_handler(message: Message):
-    await message.answer("You are not linked with any user so far.")

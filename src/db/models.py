@@ -1,5 +1,5 @@
 from pytz import timezone
-from sqlalchemy import Column, Integer, BigInteger, String, DateTime, func, ForeignKey, DECIMAL, UniqueConstraint
+from sqlalchemy import Column, Integer, BigInteger, String, DateTime, func, ForeignKey, DECIMAL, UniqueConstraint, CheckConstraint
 from sqlalchemy.orm import declared_attr, relationship
 
 from config_reader import config

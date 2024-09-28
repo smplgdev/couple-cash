@@ -1,4 +1,4 @@
-from sqlalchemy import select, distinct, exists
+from sqlalchemy import select, exists
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import DataError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -43,6 +43,16 @@ async def create_or_update_user(
     return result.scalar_one_or_none()
 
 
+async def get_user_or_none(session: AsyncSession, user_tg_id: int) -> User | None:
+    stmt = (
+        select(User).
+        filter(User.tg_id == user_tg_id)
+    )
+
+    result = await session.execute(stmt)
+    return result.scalar_one_or_none()
+
+
 async def add_expense(
         session: AsyncSession,
         user_id: int,
@@ -83,6 +93,16 @@ async def is_user_linked(session: AsyncSession, tg_id: int) -> bool:
 
     is_exists = await session.execute(stmt)
     return is_exists.scalar()
+
+
+async def create_user_relationship(session: AsyncSession, initiating_user_tg_id: int, partner_user_tg_id: int):
+    await session.merge(
+        UserRelationship(
+            initiating_user_tg_id=initiating_user_tg_id,
+            partner_user_tg_id=partner_user_tg_id
+        )
+    )
+    await session.commit()
 
 
 async def get_user_relationship(session: AsyncSession, tg_id: int) -> UserRelationship | None:

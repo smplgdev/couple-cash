@@ -5,7 +5,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from bot.handlers.messages import expense
+from bot.handlers.messages import expense, non_linked_users
 
 from bot.handlers.messages import count_difference
 from bot.middlewares.db import DbSessionMiddleware
@@ -44,6 +44,8 @@ async def main():
     dp.update.middleware(DbSessionMiddleware(session_pool=sessionmaker))
 
     dp.include_router(start.router)
+    dp.include_router(non_linked_users.router)
+
     dp.include_router(expense_command.router)
     dp.include_router(expense.router)
     dp.include_router(count_difference.router)
