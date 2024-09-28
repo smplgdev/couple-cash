@@ -60,22 +60,20 @@ async def add_expense(
         category: str,
         comment: str,
         payment_type: str
-) -> bool:
-    await session.merge(
-        Expense(
-            user_tg_id=user_id,
-            amount=amount,
-            category=category,
-            comment=comment,
-            payment_type=payment_type
-        )
+) -> Expense | None:
+    expense = Expense(
+        user_tg_id=user_id,
+        amount=amount,
+        category=category,
+        comment=comment,
+        payment_type=payment_type
     )
+    await session.merge(expense)
     try:
         await session.commit()
     except DataError:
-        return False
-
-    return True
+        return None
+    return expense
 
 
 async def is_user_linked(session: AsyncSession, tg_id: int) -> bool:
