@@ -40,7 +40,6 @@ def get_buttons(property):
         if i + 1 < len(options) else [KeyboardButton(text=options[i])]
         for i in range(0, len(options), 2)
     ]
-    pprint(buttons)
     return buttons
 
 # TODO: Implement the create_db_record function
