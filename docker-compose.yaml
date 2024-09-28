@@ -1,0 +1,17 @@
+services:
+  bot:
+    container_name: syncbudget_bot
+    build: .
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+    restart: always
+  db:
+    container_name: syncbudget_db
+    image: postgres:17.0-alpine
+    env_file:
+      - ./.env
+    ports:
+      - "5432:5432"
+    restart: always

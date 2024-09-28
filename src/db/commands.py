@@ -1,4 +1,4 @@
-from sqlalchemy import select, distinct
+from sqlalchemy import select, distinct, exists
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import DataError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -69,27 +69,33 @@ async def add_expense(
 
 
 async def is_user_linked(session: AsyncSession, tg_id: int) -> bool:
-    # TODO: Rewrite this with exists()
-
     stmt = (
-        select(UserRelationship).
-        filter(
-            or_(
-                UserRelationship.initiating_user_tg_id == tg_id,
-                UserRelationship.partner_user_tg_id == tg_id,
+        select(
+            exists().
+            where(
+                or_(
+                    UserRelationship.initiating_user_tg_id == tg_id,
+                    UserRelationship.partner_user_tg_id == tg_id,
+                )
             )
         )
     )
 
     is_exists = await session.execute(stmt)
-    return bool(is_exists.scalar_one_or_none())
+    return is_exists.scalar()
 
 
 async def select_last_categories_of_user(session: AsyncSession, user_tg_id: int, n: int = 5) -> list[str]:
-    stmt = (
-        select(Expense.category).
-        where(Expense.user_tg_id == user_tg_id).
+    subq = (
+        select(Expense.category, Expense.created_at).
+        filter(Expense.user_tg_id == user_tg_id).
         order_by(Expense.created_at.desc()).
+        subquery()
+    )
+
+    stmt = (
+        select(subq.c.category).
+        distinct().
         limit(n)
     )
 
