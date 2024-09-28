@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     postgres_password: str
     postgres_db: str
     postgres_port: int
+    notion_api_key: SecretStr
+    notion_db_id: SecretStr
 
     class Config:
         env_file = '../.env'
