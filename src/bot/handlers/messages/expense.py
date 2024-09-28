@@ -1,4 +1,5 @@
-from aiogram import Router, F
+import aiogram.exceptions
+from aiogram import Router, F, Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message
@@ -6,6 +7,7 @@ from aiogram.utils.markdown import hcode
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.keyboards import payment_type_keyboard, main_menu_keyboard, category_keyboard, ADD_EXPENSE
+from db import UserRelationship
 from db.commands import add_expense, select_last_categories_of_user
 from filters.linked_users import LinkedUsersFilter
 
@@ -62,7 +64,7 @@ async def comment_handler(message: Message, state: FSMContext):
 
 
 @router.message(LinkedUsersFilter(), ExpenseStates.payment_type)
-async def payment_type_handler(message: Message, state: FSMContext, session: AsyncSession):
+async def payment_type_handler(message: Message, state: FSMContext, session: AsyncSession, relationship: UserRelationship, bot: Bot):
     payment_type = message.text
     await state.update_data(payment_type=payment_type)
 
@@ -74,11 +76,15 @@ async def payment_type_handler(message: Message, state: FSMContext, session: Asy
     # Add expense to the database
     await add_expense(session, message.from_user.id, amount, category, comment, payment_type)
 
+    if message.from_user.id == relationship.initiating_user_tg_id:
+        partner_id = relationship.partner_user_tg_id
+    else:
+        partner_id = relationship.initiating_user_tg_id
+
+    try:
+        await bot.send_message(partner_id, f"New expense {hcode(f"{amount} €".replace(".", ","))} from {message.from_user.first_name} with category {hcode(category)} and comment {hcode(comment)}!")
+    except aiogram.exceptions.TelegramNotFound:
+        pass
     await state.clear()
-    await message.answer(f"Expense {hcode(amount)} has been added with category {hcode(category)} and comment {hcode(comment)}!",
+    await message.answer(f"Expense {hcode(f"{amount} €".replace(".", ","))} has been added with category {hcode(category)} and comment {hcode(comment)}!",
                          reply_markup=main_menu_keyboard)
-
-
-@router.message(~LinkedUsersFilter(), F.text == ADD_EXPENSE)
-async def not_linked_user_handler(message: Message):
-    await message.answer("You are not linked with any user so far.")

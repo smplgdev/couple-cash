@@ -3,7 +3,6 @@ from typing import Iterable
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from notion.api import get_buttons
 
-LINK_YOUR_PARTNER = "Link your partner"
 ADD_EXPENSE = "Add expense"
 COUNT_DIFFERENCE = "Count difference"
 
