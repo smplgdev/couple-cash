@@ -5,17 +5,25 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 main_menu_keyboard = ReplyKeyboardMarkup(keyboard=[
     [
         KeyboardButton(text="Add expense"),
+    ],
+    [
+        KeyboardButton(text="Count difference"),
     ]
 ], resize_keyboard=True)
 
 
+PAY_FOR_MYSELF = "Pay for myself"
+PAY_FOR_MY_PARTNER = "Pay for my partner"
+SPLIT_THE_EXPENSE = "Split the expense"
+
+
 payment_type_keyboard = ReplyKeyboardMarkup(keyboard=[
     [
-        KeyboardButton(text="Pay for myself"),
-        KeyboardButton(text="Pay for my partner"),
+        KeyboardButton(text=PAY_FOR_MYSELF),
+        KeyboardButton(text=PAY_FOR_MY_PARTNER),
     ],
     [
-        KeyboardButton(text="Split the expense"),
+        KeyboardButton(text=SPLIT_THE_EXPENSE),
     ]
 ], resize_keyboard=True)
 

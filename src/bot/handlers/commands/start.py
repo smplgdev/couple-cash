@@ -1,5 +1,6 @@
 from aiogram import Router
 from aiogram.filters import CommandStart
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,7 +11,9 @@ router = Router()
 
 
 @router.message(CommandStart())
-async def start_command(message: Message, session: AsyncSession):
+async def start_command(message: Message, session: AsyncSession, state: FSMContext):
+    await state.clear()
+
     await create_or_update_user(
         session=session,
         tg_id=message.from_user.id,

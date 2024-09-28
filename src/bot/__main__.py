@@ -5,7 +5,9 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from bot.handlers.callbacks import expense
+from bot.handlers.messages import expense
+
+from bot.handlers.messages import count_difference
 from bot.middlewares.db import DbSessionMiddleware
 from config_reader import config
 
@@ -44,6 +46,7 @@ async def main():
     dp.include_router(start.router)
     dp.include_router(expense_command.router)
     dp.include_router(expense.router)
+    dp.include_router(count_difference.router)
 
     try:
         await dp.start_polling(bot, allowed_updates=dp.resolve_used_update_types())

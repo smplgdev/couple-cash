@@ -85,7 +85,24 @@ async def is_user_linked(session: AsyncSession, tg_id: int) -> bool:
     return is_exists.scalar()
 
 
+async def get_user_relationship(session: AsyncSession, tg_id: int) -> UserRelationship | None:
+    stmt = (
+        select(UserRelationship).
+        where(
+            or_(
+                UserRelationship.initiating_user_tg_id == tg_id,
+                UserRelationship.partner_user_tg_id == tg_id,
+            )
+        )
+    )
+
+    result = await session.execute(stmt)
+    return result.scalar_one_or_none()
+
+
 async def select_last_categories_of_user(session: AsyncSession, user_tg_id: int, n: int = 5) -> list[str]:
+    # TODO: add partner's categories as well
+
     subq = (
         select(Expense.category, Expense.created_at).
         filter(Expense.user_tg_id == user_tg_id).
@@ -101,3 +118,18 @@ async def select_last_categories_of_user(session: AsyncSession, user_tg_id: int,
 
     result = await session.execute(stmt)
     return list(set(row[0] for row in result.all()))
+
+
+async def get_all_expenses(session: AsyncSession, relationship: UserRelationship):
+    stmt = (
+        select(Expense).
+        where(
+            or_(
+                Expense.user_tg_id == relationship.partner_user_tg_id,
+                Expense.user_tg_id == relationship.initiating_user_tg_id,
+            )
+        )
+    )
+
+    result = await session.execute(stmt)
+    return result.scalars().all()

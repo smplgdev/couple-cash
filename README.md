@@ -9,7 +9,7 @@ A project that helps couples manage their finances together.
 - [x] GUI for adding expenses (buttons, text fields, etc.)
 - [ ] GUI for linking partner's account
 - [x] Possibility to choose whether to split the expense or not (three modes: pay for myself, pay for my partner, split the expense)
-- [ ] Add a command to show the current balance
+- [x] Add GUI button to show the current difference (how much you owe or owe you)
 - [ ] Export data to Notion
 - [ ] Support different currencies
-- [ ] Add files to deploy the project
+- [x] Add files to deploy the project
