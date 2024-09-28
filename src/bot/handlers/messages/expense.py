@@ -8,8 +8,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from bot.keyboards import payment_type_keyboard, main_menu_keyboard, category_keyboard, ADD_EXPENSE
 from db import UserRelationship
-from db.commands import add_expense, select_last_categories_of_user
+from db.commands import add_expense
 from filters.linked_users import LinkedUsersFilter
+from notion.api import create_db_record
 
 
 class ExpenseStates(StatesGroup):
@@ -75,6 +76,44 @@ async def payment_type_handler(message: Message, state: FSMContext, session: Asy
 
     # Add expense to the database
     await add_expense(session, message.from_user.id, amount, category, comment, payment_type)
+
+    body = {
+        "Title": {
+            "title": [
+                {
+                    "text": {
+                        "content": comment  # Комментарий к покупке
+                    }
+                }
+            ]
+        },
+        "Type of expenses": {
+            "select": {
+                "name": payment_type  # "Split the bill" | | "Payed for my partner" | | "Payed for myself"
+            }
+        },
+        "Cost": {
+            "number": amount
+        },
+        "Category": {
+            "select": {
+                "name": category
+            }
+        },
+        # TODO: add subcategory
+        # "Subcategory": {
+        #     "select": {
+        #         "name": None
+        #     }
+        # },
+        "Wallet": {
+            "select": {
+                "name": message.from_user.first_name
+            }
+        }
+    }
+
+    create_db_record(body)
 
     if message.from_user.id == relationship.initiating_user_tg_id:
         partner_id = relationship.partner_user_tg_id

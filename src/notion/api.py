@@ -15,6 +15,7 @@ headers = {
     "Notion-Version": "2022-06-28"
 }
 
+
 def format_props(data):
     transformed = {}
     
@@ -27,11 +28,13 @@ def format_props(data):
     
     return transformed
 
+
 def get_db_props():
     url = f"{base_url}/databases/{database_id}"
     response = requests.get(url, headers=headers)
     props = format_props(response.json()['properties'])
     return props
+
 
 def get_buttons(property):
     options = get_db_props()[property]['options']
@@ -41,6 +44,7 @@ def get_buttons(property):
         for i in range(0, len(options), 2)
     ]
     return buttons
+
 
 # TODO: Implement the create_db_record function
 def create_db_record(properties):

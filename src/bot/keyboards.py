@@ -12,20 +12,18 @@ select_types = {
     "SUBCATEGORY": "Subcategory"
 }
 
-main_menu_keyboard = ReplyKeyboardMarkup(keyboard=[
-    [
-        KeyboardButton(text=ADD_EXPENSE),
+main_menu_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [
+            KeyboardButton(text=ADD_EXPENSE),
+        ],
+        [
+            KeyboardButton(text=COUNT_DIFFERENCE),
+        ]
     ],
-    [
-        KeyboardButton(text=COUNT_DIFFERENCE),
-    ]
-], resize_keyboard=True)
-
-link_user_markup = ReplyKeyboardMarkup(keyboard=[
-    [
-        KeyboardButton(text=LINK_YOUR_PARTNER),
-    ],
-], resize_keyboard=True)
+    resize_keyboard=True,
+    one_time_keyboard=True
+)
 
 payment_type_keyboard = ReplyKeyboardMarkup(
     keyboard=get_buttons(select_types["PAYMENT_TYPE"]), 
@@ -34,13 +32,15 @@ payment_type_keyboard = ReplyKeyboardMarkup(
 
 category_keyboard = ReplyKeyboardMarkup(
     keyboard=get_buttons(select_types["CATEGORY"]), 
-    resize_keyboard=True
+    resize_keyboard=True,
+    one_time_keyboard=True
 )
 
 subcategory_keyboard = ReplyKeyboardMarkup(
     keyboard=get_buttons(select_types["SUBCATEGORY"]), 
     resize_keyboard=True
 )
+
 
 def categories_markup(categories: Iterable) -> ReplyKeyboardMarkup:
     keyboard = []
