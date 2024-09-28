@@ -6,7 +6,7 @@ from aiogram.types import Message
 from aiogram.utils.markdown import hcode
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from bot.keyboards import payment_type_keyboard, main_menu_keyboard, categories_markup, ADD_EXPENSE
+from bot.keyboards import payment_type_keyboard, main_menu_keyboard, category_keyboard, ADD_EXPENSE
 from db import UserRelationship
 from db.commands import add_expense, select_last_categories_of_user
 from filters.linked_users import LinkedUsersFilter
@@ -41,8 +41,7 @@ async def amount_handler(message: Message, state: FSMContext, session: AsyncSess
     await state.update_data(amount=amount)
 
     await state.set_state(ExpenseStates.category)
-    last_five_categories = await select_last_categories_of_user(session, user_tg_id=message.from_user.id, n=5)
-    await message.answer("Please, specify the category of the expense:", reply_markup=categories_markup(last_five_categories))
+    await message.answer("Please, specify the category of the expense:", reply_markup=category_keyboard)
 
 
 @router.message(LinkedUsersFilter(), ExpenseStates.category)

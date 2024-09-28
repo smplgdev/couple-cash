@@ -1,13 +1,16 @@
 from typing import Iterable
 
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from notion.api import get_buttons
 
 ADD_EXPENSE = "Add expense"
 COUNT_DIFFERENCE = "Count difference"
 
-PAY_FOR_MYSELF = "Pay for myself"
-PAY_FOR_MY_PARTNER = "Pay for my partner"
-SPLIT_THE_EXPENSE = "Split the expense"
+select_types = {
+    "PAYMENT_TYPE": "Type of expenses",
+    "CATEGORY": "Category",
+    "SUBCATEGORY": "Subcategory"
+}
 
 main_menu_keyboard = ReplyKeyboardMarkup(keyboard=[
     [
@@ -18,16 +21,26 @@ main_menu_keyboard = ReplyKeyboardMarkup(keyboard=[
     ]
 ], resize_keyboard=True)
 
-payment_type_keyboard = ReplyKeyboardMarkup(keyboard=[
+link_user_markup = ReplyKeyboardMarkup(keyboard=[
     [
-        KeyboardButton(text=PAY_FOR_MYSELF),
-        KeyboardButton(text=PAY_FOR_MY_PARTNER),
+        KeyboardButton(text=LINK_YOUR_PARTNER),
     ],
-    [
-        KeyboardButton(text=SPLIT_THE_EXPENSE),
-    ]
 ], resize_keyboard=True)
 
+payment_type_keyboard = ReplyKeyboardMarkup(
+    keyboard=get_buttons(select_types["PAYMENT_TYPE"]), 
+    resize_keyboard=True
+)
+
+category_keyboard = ReplyKeyboardMarkup(
+    keyboard=get_buttons(select_types["CATEGORY"]), 
+    resize_keyboard=True
+)
+
+subcategory_keyboard = ReplyKeyboardMarkup(
+    keyboard=get_buttons(select_types["SUBCATEGORY"]), 
+    resize_keyboard=True
+)
 
 def categories_markup(categories: Iterable) -> ReplyKeyboardMarkup:
     keyboard = []
