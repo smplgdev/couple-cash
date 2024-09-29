@@ -1,6 +1,6 @@
 from typing import Iterable
 
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
 from notion.api import get_buttons
 
 ADD_EXPENSE = "Add expense"
@@ -19,6 +19,9 @@ main_menu_keyboard = ReplyKeyboardMarkup(
         ],
         [
             KeyboardButton(text=COUNT_DIFFERENCE),
+        ],
+        [
+            KeyboardButton(text="Web App", web_app=WebAppInfo(url="https://syncbudget.serveo.net/"))
         ]
     ],
     resize_keyboard=True,
