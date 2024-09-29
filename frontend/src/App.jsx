@@ -1,9 +1,11 @@
 import './assets/css/index.css'
 import { useTranslation } from 'react-i18next'
+import { RouterProvider } from "react-router-dom"
 import WebApp from '@twa-dev/sdk'
+import router from './router'
 
 function App() {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
 
   WebApp.showAlert('Hey there!')
 
@@ -11,11 +13,7 @@ function App() {
 
   console.log(t("Hello world"))
 
-  return (
-    <div className="text-red-500">
-      {t("Hello world")}
-    </div>
-  );
+  return <RouterProvider router={router} />
 }
 
-export default App;
+export default App
