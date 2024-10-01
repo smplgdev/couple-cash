@@ -20,7 +20,7 @@ async def count_difference_handler(message: Message, session: AsyncSession, rela
     for expense in expenses:
         value = 0
         if expense.user_tg_id == message.from_user.id and expense.payment_type == PAY_FOR_MY_PARTNER:
-            value = -expense.amoun
+            value = -expense.amount
         elif expense.user_tg_id == message.from_user.id and expense.payment_type == SPLIT_THE_EXPENSE:
             value = -(expense.amount / 2)
         elif expense.user_tg_id != message.from_user.id and expense.payment_type == SPLIT_THE_EXPENSE:
