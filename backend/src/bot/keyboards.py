@@ -1,7 +1,9 @@
 from typing import Iterable
 
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
-from notion.api import get_buttons
+from aiogram.utils.keyboard import ReplyKeyboardBuilder
+
+from notion.api import get_db_props
 
 server_link = "https://4ae59326641dac374842ceeffb80b50c.serveo.net"
 
@@ -30,25 +32,17 @@ main_menu_keyboard = ReplyKeyboardMarkup(
     one_time_keyboard=True
 )
 
-payment_type_keyboard = ReplyKeyboardMarkup(
-    keyboard=get_buttons(select_types["PAYMENT_TYPE"]), 
-    resize_keyboard=True
-)
 
-category_keyboard = ReplyKeyboardMarkup(
-    keyboard=get_buttons(select_types["CATEGORY"]), 
-    resize_keyboard=True,
-    one_time_keyboard=True
-)
+def get_property_keyboard(prop: str) -> ReplyKeyboardMarkup:
+    options = get_db_props()[prop]['options']
 
-subcategory_keyboard = ReplyKeyboardMarkup(
-    keyboard=get_buttons(select_types["SUBCATEGORY"]), 
-    resize_keyboard=True
-)
+    builder = ReplyKeyboardBuilder()
+    for option in options:
+        builder.button(text=option)
+    builder.adjust(2)
+    return builder.as_markup(resize_keyboard=True, one_time_keyboard=True)
 
 
-def categories_markup(categories: Iterable) -> ReplyKeyboardMarkup:
-    keyboard = []
-    for category in set(categories):
-        keyboard.append([KeyboardButton(text=category)])
-    return ReplyKeyboardMarkup(keyboard=keyboard, resize_keyboard=True, one_time_keyboard=True)
+payment_type_keyboard = get_property_keyboard(select_types["PAYMENT_TYPE"])
+category_keyboard = get_property_keyboard(select_types["CATEGORY"])
+subcategory_keyboard = get_property_keyboard(select_types["SUBCATEGORY"])

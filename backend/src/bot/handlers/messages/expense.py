@@ -9,9 +9,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from bot.handlers.messages.count_difference import PAY_FOR_MY_PARTNER, SPLIT_THE_EXPENSE
 from bot.keyboards import payment_type_keyboard, main_menu_keyboard, category_keyboard, ADD_EXPENSE
 from db import UserRelationship
-from db.commands import add_expense
+from db.commands import create_expense
 from filters.linked_users import LinkedUsersFilter
-from notion.api import create_db_record
+from notion.api import create_notion_db_record
+from schemas import ExpenseCreate
 
 
 class ExpenseStates(StatesGroup):
@@ -31,7 +32,7 @@ async def expense_handler(message: Message, state: FSMContext):
 
 
 @router.message(LinkedUsersFilter(), ExpenseStates.amount)
-async def amount_handler(message: Message, state: FSMContext, session: AsyncSession):
+async def amount_handler(message: Message, state: FSMContext):
     amount_as_text = message.text.replace(",", ".")
 
     try:
@@ -75,46 +76,12 @@ async def payment_type_handler(message: Message, state: FSMContext, session: Asy
     category = data["category"]
     comment = data["comment"]
 
+    expense = ExpenseCreate(user_tg_id=message.from_user.id, amount=amount, category=category, comment=comment, payment_type=payment_type)
+
     # Add expense to the database
-    await add_expense(session, message.from_user.id, amount, category, comment, payment_type)
+    await create_expense(session, expense)
 
-    body = {
-        "Title": {
-            "title": [
-                {
-                    "text": {
-                        "content": comment  # Комментарий к покупке
-                    }
-                }
-            ]
-        },
-        "Type of expenses": {
-            "select": {
-                "name": payment_type  # "Split the bill" | | "Payed for my partner" | | "Payed for myself"
-            }
-        },
-        "Cost": {
-            "number": amount
-        },
-        "Category": {
-            "select": {
-                "name": category
-            }
-        },
-        # TODO: add subcategory
-        # "Subcategory": {
-        #     "select": {
-        #         "name": None
-        #     }
-        # },
-        "Wallet": {
-            "select": {
-                "name": message.from_user.first_name
-            }
-        }
-    }
-
-    create_db_record(body)
+    create_notion_db_record(expense, purchaser_name=message.from_user.first_name)
 
     if payment_type in (PAY_FOR_MY_PARTNER, SPLIT_THE_EXPENSE):
         if message.from_user.id == relationship.initiating_user_tg_id:

@@ -6,6 +6,7 @@ from sqlalchemy.sql.operators import or_
 
 from db import User, UserRelationship
 from db.models import Expense
+from schemas import ExpenseCreate
 
 
 async def create_or_update_user(
@@ -53,27 +54,17 @@ async def get_user_or_none(session: AsyncSession, user_tg_id: int) -> User | Non
     return result.scalar_one_or_none()
 
 
-async def add_expense(
+async def create_expense(
         session: AsyncSession,
-        user_id: int,
-        amount: float,
-        category: str,
-        comment: str,
-        payment_type: str
+        expense: ExpenseCreate,
 ) -> Expense | None:
-    expense = Expense(
-        user_tg_id=user_id,
-        amount=amount,
-        category=category,
-        comment=comment,
-        payment_type=payment_type
-    )
-    await session.merge(expense)
+    expense_db = Expense(**expense.model_dump())
+    await session.merge(expense_db)
     try:
         await session.commit()
     except DataError:
         return None
-    return expense
+    return expense_db
 
 
 async def is_user_linked(session: AsyncSession, tg_id: int) -> bool:

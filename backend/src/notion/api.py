@@ -1,22 +1,21 @@
 import requests
+
 from config_reader import config
-from pprint import pprint
+from schemas import ExpenseBase
 
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+NOTION_API_KEY = config.notion_api_key.get_secret_value()
+DATABASE_ID = config.notion_db_id.get_secret_value()
 
-notion_api_key = config.notion_api_key.get_secret_value()
-database_id = config.notion_db_id.get_secret_value()
-
-base_url = 'https://api.notion.com/v1'
+NOTION_API_BASE_URL = 'https://api.notion.com/v1'
 
 headers = {
-    "Authorization": f"Bearer {notion_api_key}",
+    "Authorization": f"Bearer {NOTION_API_KEY}",
     "Content-Type": "application/json",
     "Notion-Version": "2022-06-28"
 }
 
 
-def format_props(data):
+def format_props(data: dict) -> dict:
     transformed = {}
     
     for key, value in data.items():
@@ -29,31 +28,49 @@ def format_props(data):
     return transformed
 
 
-def get_db_props():
-    url = f"{base_url}/databases/{database_id}"
+def get_db_props() -> dict:
+    url = f"{NOTION_API_BASE_URL}/databases/{DATABASE_ID}"
     response = requests.get(url, headers=headers)
     props = format_props(response.json()['properties'])
     return props
 
 
-def get_buttons(property):
-    options = get_db_props()[property]['options']
-    buttons = [
-        [KeyboardButton(text=options[i]), KeyboardButton(text=options[i+1])]
-        if i + 1 < len(options) else [KeyboardButton(text=options[i])]
-        for i in range(0, len(options), 2)
-    ]
-    return buttons
-
-
-# TODO: Implement the create_db_record function
-def create_db_record(properties):
-    url = f"{base_url}/pages"
-    data = {
+def create_notion_db_record(expense: ExpenseBase, purchaser_name: str) -> dict:
+    url = f"{NOTION_API_BASE_URL}/pages"
+    properties = {
+        "Title": {
+            "title": [
+                {
+                    "text": {
+                        "content": expense.comment
+                    }
+                }
+            ]
+        },
+        "Type of expenses": {
+            "select": {
+                "name": expense.payment_type  # "Split the bill" | | "Payed for my partner" | | "Payed for myself"
+            }
+        },
+        "Cost": {
+            "number": expense.amount
+        },
+        "Category": {
+            "select": {
+                "name": expense.category
+            }
+        },
+        "Wallet": {
+            "select": {
+                "name": purchaser_name
+            }
+        }
+    }
+    payload = {
         "parent": {
-            "database_id": database_id
+            "database_id": DATABASE_ID
         },
         "properties": properties
     }
-    response = requests.post(url, headers=headers, json=data)
+    response = requests.post(url, headers=headers, json=payload)
     return response.json()
