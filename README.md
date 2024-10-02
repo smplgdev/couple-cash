@@ -15,6 +15,7 @@ A project that helps couples manage their finances together.
 - [ ] Subcategory for Food category
 - [ ] GUI for subcategory creation for other categories
 - [ ] Support different currencies
+- [ ] Summary of recent spendings (statement)
 
 scaling:
 - [ ] Ininitial Notion DB creation by structure
