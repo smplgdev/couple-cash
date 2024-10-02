@@ -11,7 +11,7 @@ A project that helps couples manage their finances together.
 - [x] Add GUI button to show the current difference (how much you owe or owe you)
 - [x] Export data to Notion
 - [x] Add files to deploy the project
-- [ ] Filter notification of new expense (only split and for partner)
+- [x] Filter notification of new expense (only split and for partner)
 - [ ] Subcategory for Food category
 - [ ] GUI for subcategory creation for other categories
 - [ ] Support different currencies
