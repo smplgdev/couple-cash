@@ -6,6 +6,7 @@ from aiogram.types import Message
 from aiogram.utils.markdown import hcode
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from bot.handlers.messages.count_difference import PAY_FOR_MY_PARTNER, SPLIT_THE_EXPENSE
 from bot.keyboards import payment_type_keyboard, main_menu_keyboard, category_keyboard, ADD_EXPENSE
 from db import UserRelationship
 from db.commands import add_expense
@@ -115,15 +116,17 @@ async def payment_type_handler(message: Message, state: FSMContext, session: Asy
 
     create_db_record(body)
 
-    if message.from_user.id == relationship.initiating_user_tg_id:
-        partner_id = relationship.partner_user_tg_id
-    else:
-        partner_id = relationship.initiating_user_tg_id
+    if payment_type in (PAY_FOR_MY_PARTNER, SPLIT_THE_EXPENSE):
+        if message.from_user.id == relationship.initiating_user_tg_id:
+            partner_id = relationship.partner_user_tg_id
+        else:
+            partner_id = relationship.initiating_user_tg_id
 
-    try:
-        await bot.send_message(partner_id, f"New expense {hcode(f"{amount} €".replace(".", ","))} from {message.from_user.first_name} with category {hcode(category)} and comment {hcode(comment)}!")
-    except aiogram.exceptions.TelegramNotFound:
-        pass
+        try:
+
+            await bot.send_message(partner_id, f"New expense {hcode(f"{amount} €".replace(".", ","))} from {message.from_user.first_name} with category {hcode(category)} and comment {hcode(comment)}!")
+        except aiogram.exceptions.TelegramNotFound:
+            pass
     await state.clear()
     await message.answer(f"Expense {hcode(f"{amount} €".replace(".", ","))} has been added with category {hcode(category)} and comment {hcode(comment)}!",
                          reply_markup=main_menu_keyboard)
