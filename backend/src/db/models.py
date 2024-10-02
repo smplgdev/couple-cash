@@ -22,7 +22,7 @@ class User(TimeStampedMixin, Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
-    tg_id = Column(BigInteger, unique=True)
+    tg_id = Column(BigInteger, unique=True, index=True)
     tg_username = Column(String(length=32), unique=True)
     tg_first_name = Column(String(length=64))
     tg_language_code = Column(String(length=6))
