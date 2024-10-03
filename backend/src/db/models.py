@@ -27,6 +27,8 @@ class User(TimeStampedMixin, Base):
     tg_first_name = Column(String(length=64))
     tg_language_code = Column(String(length=6))
 
+    expenses = relationship("Expense", back_populates="user", cascade="all, delete-orphan")
+
 
 class Expense(TimeStampedMixin, Base):
     __tablename__ = "expenses"
@@ -37,6 +39,8 @@ class Expense(TimeStampedMixin, Base):
     category = Column(String(length=64))
     comment = Column(String(length=255))
     payment_type = Column(String(length=32), nullable=False)
+
+    user = relationship("User", back_populates="expenses")
 
 
 class UserRelationship(Base):

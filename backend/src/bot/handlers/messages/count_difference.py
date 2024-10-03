@@ -9,6 +9,7 @@ from filters.linked_users import LinkedUsersFilter
 router = Router()
 
 PAY_FOR_MY_PARTNER = "Payed for my partner"
+PAY_FOR_MYSELF = "Payed for myself"
 SPLIT_THE_EXPENSE = "Split the bill"
 
 

@@ -1,14 +1,11 @@
-from typing import Iterable
-
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, WebAppInfo
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 from notion.api import get_db_props
 
-server_link = "https://4ae59326641dac374842ceeffb80b50c.serveo.net"
-
 ADD_EXPENSE = "Add expense"
 COUNT_DIFFERENCE = "Count difference"
+RECENT_EXPENSES = "Recent expenses"
 
 select_types = {
     "PAYMENT_TYPE": "Type of expenses",
@@ -23,10 +20,8 @@ main_menu_keyboard = ReplyKeyboardMarkup(
         ],
         [
             KeyboardButton(text=COUNT_DIFFERENCE),
+            KeyboardButton(text=RECENT_EXPENSES),
         ],
-        [
-            KeyboardButton(text="Web App", web_app=WebAppInfo(url=server_link))
-        ]
     ],
     resize_keyboard=True,
     one_time_keyboard=True

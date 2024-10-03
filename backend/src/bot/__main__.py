@@ -5,13 +5,11 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
-from bot.handlers.messages import expense, non_linked_users
-
+from bot.handlers.commands import start
 from bot.handlers.messages import count_difference
+from bot.handlers.messages import expense, non_linked_users, recent_expenses
 from bot.middlewares.db import DbSessionMiddleware
 from config_reader import config
-
-from bot.handlers.commands import start
 
 
 def setup_logging():
@@ -47,6 +45,7 @@ async def main():
     dp.include_router(non_linked_users.router)
 
     dp.include_router(expense.router)
+    dp.include_router(recent_expenses.router)
     dp.include_router(count_difference.router)
 
     try:
