@@ -1,7 +1,8 @@
 from datetime import timedelta, date
 
-from aiogram import Router, F
+from aiogram import Router, F, Bot
 from aiogram.fsm.context import FSMContext
+from aiogram.methods import SendMessage
 from aiogram.types import Message
 from aiogram.utils.markdown import hbold
 from sqlalchemy import select
@@ -11,6 +12,7 @@ from sqlalchemy.sql.operators import and_
 
 from bot.handlers.messages.count_difference import PAY_FOR_MY_PARTNER, SPLIT_THE_EXPENSE, PAY_FOR_MYSELF
 from bot.keyboards import RECENT_EXPENSES
+from bot.utils.send_probably_long_message import send_probably_long_message
 from db import UserRelationship, Expense
 from filters.linked_users import LinkedUsersFilter
 
@@ -53,13 +55,12 @@ async def get_recent_expenses_text(session: AsyncSession, relationship: UserRela
             text_parts.append(f"\n{expense.user.tg_first_name} [{expense.created_at.strftime("%d.%m at %H:%M")}]\n{sum_text}\n{expense.category}\n{expense.comment}")
 
     text_parts.append(hbold(f"\nYou spent in the last {period} days in total: {str(round(spent, 2)).replace(".", ",")} €"))
-
     return "\n".join(text_parts)
 
 
 @router.message(LinkedUsersFilter(), F.text == RECENT_EXPENSES)
-async def last_expenses_handler(message: Message, state: FSMContext,
+async def last_expenses_handler(message: Message, state: FSMContext, bot: Bot,
                                 session: AsyncSession, relationship: UserRelationship):
     await state.clear()
     text = await get_recent_expenses_text(session, relationship, message.from_user.id)
-    await message.answer(text)
+    await send_probably_long_message(bot, message.from_user.id, text)
