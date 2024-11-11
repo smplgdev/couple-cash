@@ -10,6 +10,7 @@ class Settings(BaseSettings):
         extra='ignore'
     )
 
+    debug: bool
     bot_token: SecretStr
     timezone: str
     postgres_user: str
@@ -27,8 +28,8 @@ class Settings(BaseSettings):
             scheme="postgresql+psycopg",
             username=self.postgres_user,
             password=self.postgres_password,
-            host=self.postgres_host,
-            port=self.postgres_port,
+            host=self.postgres_host if not self.debug else "localhost",
+            port=self.postgres_port if not self.debug else 5435,
             path=self.postgres_db,
         )
 

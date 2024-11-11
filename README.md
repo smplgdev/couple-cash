@@ -12,11 +12,12 @@ A project that helps couples manage their finances together.
 - [x] Export data to Notion
 - [x] Add files to deploy the project
 - [x] Filter notification of new expense (only split and for partner)
-- [ ] Subcategory for Food category
-- [ ] GUI for subcategory creation for other categories
-- [ ] Support different currencies
 - [x] Summary of recent spendings (statement)
+- [ ] Monthly expenses
+- [ ] Receipt uploading support
 
 scaling:
+- [ ] Support different currencies
 - [ ] Ininitial Notion DB creation by structure
 - [ ] GUI for linking partner's account
+- [ ] GUI for subcategory creation for any category

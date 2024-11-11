@@ -6,6 +6,7 @@ from src.notion.api import get_db_props
 ADD_EXPENSE = "Add expense"
 COUNT_DIFFERENCE = "Count difference"
 RECENT_EXPENSES = "Recent expenses"
+MONTHLY_EXPENSES = "Monthly expenses"
 
 select_types = {
     "PAYMENT_TYPE": "Type of expenses",
@@ -22,6 +23,9 @@ main_menu_keyboard = ReplyKeyboardMarkup(
             KeyboardButton(text=COUNT_DIFFERENCE),
             KeyboardButton(text=RECENT_EXPENSES),
         ],
+        [
+            KeyboardButton(text=MONTHLY_EXPENSES),
+        ]
     ],
     resize_keyboard=True,
     one_time_keyboard=True

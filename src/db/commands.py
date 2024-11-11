@@ -1,8 +1,11 @@
-from sqlalchemy import select, exists
+from datetime import date, timedelta
+
+from sqlalchemy import select, exists, func
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import DataError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.sql.operators import or_
+from sqlalchemy.orm import selectinload
+from sqlalchemy.sql.operators import or_, and_
 
 from .models import Expense, User, UserRelationship
 from src.schemas import ExpenseCreate
@@ -139,5 +142,41 @@ async def get_all_expenses(session: AsyncSession, relationship: UserRelationship
         )
     )
 
+    result = await session.execute(stmt)
+    return result.scalars().all()
+
+
+async def get_user_expenses_by_month(session: AsyncSession, month_any_date: date, relationship: UserRelationship):
+    stmt = (
+        select(Expense).
+        where(
+            or_(
+                Expense.user_tg_id == relationship.partner_user_tg_id,
+                Expense.user_tg_id == relationship.initiating_user_tg_id,
+            )
+        ).
+        where(
+            func.extract('year', Expense.created_at) == month_any_date.year,
+            func.extract('month', Expense.created_at) == month_any_date.month
+        ).
+        options(selectinload(Expense.user))
+    )
+
+    result = await session.scalars(stmt)
+    return result.all()
+
+
+async def get_recent_expenses(session: AsyncSession, relationship: UserRelationship, period: int = 30):
+    stmt = (
+        select(Expense).
+        where(
+            and_(
+                Expense.user_tg_id.in_([relationship.initiating_user_tg_id, relationship.partner_user_tg_id]),
+                Expense.created_at >= date.today() - timedelta(days=period)
+            )
+        ).
+        order_by(Expense.created_at.desc()).
+        options(selectinload(Expense.user))
+    )
     result = await session.execute(stmt)
     return result.scalars().all()
