@@ -21,6 +21,9 @@ class Settings(BaseSettings):
     notion_api_key: SecretStr
     notion_db_id: SecretStr
 
+    STORAGE_PATH: str
+    STORAGE_CONTAINER: str
+
     @computed_field
     @property
     def database_uri(self) -> PostgresDsn:

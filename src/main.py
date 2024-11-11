@@ -10,6 +10,7 @@ from src.handlers.messages import count_difference, monthly_expenses
 from src.handlers.messages import expense, non_linked_users, recent_expenses
 from src.middlewares.db import DbSessionMiddleware
 from src.config_reader import settings
+from src.utils.configure_storage import configure_storage
 from src.utils.setup_logging import setup_logging
 
 
@@ -18,6 +19,8 @@ logger = logging.getLogger(__name__)
 
 async def main():
     setup_logging()
+
+    configure_storage()
 
     engine = create_async_engine(url=str(settings.database_uri), echo=True)
     sessionmaker = async_sessionmaker(engine, expire_on_commit=False)

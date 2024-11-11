@@ -1,6 +1,7 @@
 from pytz import timezone
 from sqlalchemy import Column, Integer, BigInteger, String, DateTime, func, ForeignKey, DECIMAL, UniqueConstraint
 from sqlalchemy.orm import declared_attr, relationship
+from sqlalchemy_file import ImageField
 
 from src.config_reader import settings
 from .base import Base
@@ -22,7 +23,7 @@ class User(Base, TimeStampedMixin):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
-    tg_id = Column(BigInteger, unique=True, index=True)
+    tg_id = Column(BigInteger, unique=True)
     tg_username = Column(String(length=32), unique=True)
     tg_first_name = Column(String(length=64))
     tg_language_code = Column(String(length=6))
@@ -39,6 +40,8 @@ class Expense(Base, TimeStampedMixin):
     category = Column(String(length=64))
     comment = Column(String(length=255))
     payment_type = Column(String(length=32), nullable=False)
+
+    receipt = Column(ImageField(), nullable=True)
 
     user = relationship("User", back_populates="expenses")
 

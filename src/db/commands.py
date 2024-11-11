@@ -56,7 +56,7 @@ async def get_user_or_none(session: AsyncSession, user_tg_id: int) -> User | Non
     return result.scalar_one_or_none()
 
 
-async def create_expense(
+async def _create_expense(
         session: AsyncSession,
         expense: ExpenseCreate,
 ) -> Expense | None:
@@ -67,6 +67,19 @@ async def create_expense(
     except DataError:
         return None
     return expense_db
+
+
+async def create_expense(
+    session: AsyncSession,
+    **kwargs
+):
+    expense = Expense(**kwargs)
+    session.add(expense)
+    try:
+        await session.commit()
+    except DataError:
+        return None
+    return expense
 
 
 async def is_user_linked(session: AsyncSession, tg_id: int) -> bool:

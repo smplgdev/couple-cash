@@ -14,7 +14,8 @@ A project that helps couples manage their finances together.
 - [x] Filter notification of new expense (only split and for partner)
 - [x] Summary of recent spendings (statement)
 - [x] Monthly expenses
-- [ ] Receipt uploading support
+- [x] Receipt uploading support
+- [ ] UI for viewing loaded receipts
 
 scaling:
 - [ ] Support different currencies
