@@ -146,6 +146,28 @@ async def get_all_expenses(session: AsyncSession, relationship: UserRelationship
     return result.scalars().all()
 
 
+async def get_active_expense_months(session: AsyncSession, relationship: UserRelationship):
+    stmt = (
+        select(
+            func.extract('year', Expense.created_at).label('year'),
+            func.extract('month', Expense.created_at).label('month'),
+        ).
+        where(or_(
+            Expense.user_tg_id == relationship.partner_user_tg_id,
+            Expense.user_tg_id == relationship.initiating_user_tg_id,
+        )).
+        distinct().
+        order_by('year', 'month')
+    )
+
+    result = await session.execute(stmt)
+
+    # Convert results into a list of tuples
+    active_months = [(int(row.year), int(row.month)) for row in result]
+
+    return active_months
+
+
 async def get_user_expenses_by_month(session: AsyncSession, month_any_date: date, relationship: UserRelationship):
     stmt = (
         select(Expense).

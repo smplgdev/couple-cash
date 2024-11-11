@@ -5,6 +5,9 @@ from aiogram.filters.callback_data import CallbackData
 from aiogram.types import KeyboardButton, InlineKeyboardButton
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
+from src.db import UserRelationship
+from src.db.commands import get_active_expense_months
+
 
 class NavigatorCallback(CallbackData, prefix="navigator"):
     year: int
@@ -19,7 +22,8 @@ class MonthNavigatorKeyboard:
     ignore_callback = IngoreCallback().pack()
     ignore_button = InlineKeyboardButton(text="-", callback_data=ignore_callback)
 
-    def __init__(self, year: int = datetime.now().year):
+    def __init__(self, active_months: list[tuple] = None, year: int = datetime.now().year):
+        self.active_months = active_months
         self.year = year
 
     def _navigate_year_buttons(self) -> list[InlineKeyboardButton]:
@@ -43,20 +47,34 @@ class MonthNavigatorKeyboard:
         )
         return buttons
 
+    def _get_active_months_buttons(self) -> list[InlineKeyboardButton]:
+        buttons = list()
+        for year, month in self.active_months:
+            if year != self.year:
+                continue
+            buttons.append(InlineKeyboardButton(
+                text=str(calendar.month_name[month]),
+                callback_data=NavigatorCallback(year=year, month=month).pack()
+            ))
+        return buttons
+
     def as_markup(self):
         builder = InlineKeyboardBuilder()
 
         buttons = list()
-        for i in range(1, 13):
-            buttons.append(
-                InlineKeyboardButton(
-                    text=calendar.month_name[i],
-                    callback_data=NavigatorCallback(
-                        year=self.year,
-                        month=i
-                    ).pack()
+        if self.active_months:
+            buttons.extend(self._get_active_months_buttons())
+        else:
+            for i in range(1, 13):
+                buttons.append(
+                    InlineKeyboardButton(
+                        text=calendar.month_name[i],
+                        callback_data=NavigatorCallback(
+                            year=self.year,
+                            month=i
+                        ).pack()
+                    )
                 )
-            )
         builder.add(*buttons)
         builder.adjust(1)
         builder.row(*self._navigate_year_buttons())

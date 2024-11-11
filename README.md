@@ -13,7 +13,7 @@ A project that helps couples manage their finances together.
 - [x] Add files to deploy the project
 - [x] Filter notification of new expense (only split and for partner)
 - [x] Summary of recent spendings (statement)
-- [ ] Monthly expenses
+- [x] Monthly expenses
 - [ ] Receipt uploading support
 
 scaling:

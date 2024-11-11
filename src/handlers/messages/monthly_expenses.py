@@ -6,7 +6,7 @@ from aiogram.types import Message, CallbackQuery
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db import UserRelationship
-from src.db.commands import get_user_expenses_by_month
+from src.db.commands import get_user_expenses_by_month, get_active_expense_months
 from src.filters.linked_users import LinkedUsersFilter
 from src.keyboards import MONTHLY_EXPENSES
 from src.utils.calendar import MonthNavigatorKeyboard, NavigatorCallback
@@ -16,9 +16,10 @@ from src.utils.send_probably_long_message import send_probably_long_message
 router = Router()
 
 
-@router.message(F.text == MONTHLY_EXPENSES)
-async def show_calendar_handler(message: Message):
-    calendar_kb = MonthNavigatorKeyboard()
+@router.message(LinkedUsersFilter(), F.text == MONTHLY_EXPENSES)
+async def show_calendar_handler(message: Message, session: AsyncSession, relationship: UserRelationship):
+    active_months = await get_active_expense_months(session, relationship)
+    calendar_kb = MonthNavigatorKeyboard(active_months)
     await message.answer(
         "Please, select the month you want to see the expenses for:",
         reply_markup=calendar_kb.as_markup()
@@ -31,7 +32,8 @@ async def process_months_keyboard(call: CallbackQuery, callback_data: NavigatorC
     year = callback_data.year
     month = callback_data.month
     if not month:
-        calendar_kb = MonthNavigatorKeyboard(year)
+        active_months = await get_active_expense_months(session, relationship)
+        calendar_kb = MonthNavigatorKeyboard(active_months, year)
         await call.message.edit_reply_markup(reply_markup=calendar_kb.as_markup())
         return
 
@@ -45,7 +47,7 @@ async def process_months_keyboard(call: CallbackQuery, callback_data: NavigatorC
     expenses_text = get_expenses_as_text(expenses, call.from_user.id)
 
     expenses_text = '\n'.join([
-        "Your expenses in " + month_str + ":",
+        f"Your expenses in {month_str} ({year}):",
         expenses_text,
     ])
 
