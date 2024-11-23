@@ -1,5 +1,4 @@
 from io import BytesIO
-from datetime import datetime
 
 import aiogram.exceptions
 from aiogram import Router, F, Bot
@@ -10,7 +9,6 @@ from aiogram.types import Message
 from aiogram.utils.markdown import hcode
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy_file import File
-from sqlalchemy_file.storage import StorageManager
 
 from src.handlers.messages.count_difference import PAY_FOR_MY_PARTNER, SPLIT_THE_EXPENSE
 from src.keyboards import payment_type_keyboard, main_menu_keyboard, category_keyboard, ADD_EXPENSE
@@ -89,13 +87,13 @@ async def ask_type_of_expense(message: Message, state: FSMContext):
 
 @router.message(LinkedUsersFilter(), ExpenseStates.payment_type)
 async def payment_type_handler(message: Message, state: FSMContext, session: AsyncSession, relationship: UserRelationship, bot: Bot):
-    payment_type = message.text
+    payment_type = str(message.text)
     await state.update_data(payment_type=payment_type)
 
     data = await state.get_data()
-    amount = data["amount"]
-    category = data["category"]
-    comment = data.get("comment", None)
+    amount = data.get("amount", 0)
+    category = data.get("category", "Not specified")
+    comment = data.get("comment", "Not specified")
     image_bytes: BytesIO | None = data.get("image_bytes", None)
 
     expense = ExpenseCreate(
@@ -120,11 +118,13 @@ async def payment_type_handler(message: Message, state: FSMContext, session: Asy
         payment_type=payment_type,
         amount=amount,
         relationship=relationship,
-        bot=bot
+        bot=bot,
+        category=category,
+        comment=comment
     )
 
     await state.clear()
-    await message.answer(f"Expense {hcode(f"{amount} €".replace(".", ","))} has been added with category {hcode(category)} and comment {hcode(comment)}!",
+    await message.answer(f"Expense {hcode(f"{amount} €".replace(".", ","))} has been added with category {hcode(category)} and comment {hcode(comment)}",
                          reply_markup=main_menu_keyboard)
 
 
@@ -133,7 +133,10 @@ async def send_notification_to_partner(
         payment_type: str,
         amount: float,
         relationship: UserRelationship,
-        bot: Bot) -> None:
+        bot: Bot,
+        category: str,
+        comment: str
+    ) -> None:
     if payment_type in (PAY_FOR_MY_PARTNER, SPLIT_THE_EXPENSE):
         if message.from_user.id == relationship.initiating_user_tg_id:
             partner_id = relationship.partner_user_tg_id
@@ -141,7 +144,6 @@ async def send_notification_to_partner(
             partner_id = relationship.initiating_user_tg_id
 
         try:
-
-            await bot.send_message(partner_id, f"New expense {hcode(f"{amount} €".replace(".", ","))} from {message.from_user.first_name} with category {hcode(category)} and comment {hcode(comment)}!")
+            await bot.send_message(partner_id, f"New expense {hcode(f"{amount} €".replace(".", ","))} from {message.from_user.first_name} with category {hcode(category)} and comment {hcode(comment)}")
         except aiogram.exceptions.TelegramNotFound:
             pass
