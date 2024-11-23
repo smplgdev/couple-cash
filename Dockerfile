@@ -8,6 +8,6 @@ COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
-COPY backend .
+COPY . .
 
 CMD ["sh", "-c", "alembic upgrade head && python -m src.main"]
